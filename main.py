@@ -12,9 +12,14 @@ sys.stdout = output
 sys.stderr = output
 
 
+titulo = ""
+path = f'C:/Users/{os.getlogin()}/Downloads'
+
+
 def download_video(link):
+    global titulo
     yt = YouTube(link)
-    path = f'C:/Users/{os.getlogin()}/Downloads'
+    titulo = yt.title
     ys = yt.streams.filter(only_audio=True).first().download(path)
     video.reactivate()
 
@@ -26,7 +31,7 @@ def aside_video(link):
 
 
 def download_music(link):
-    path = f'C:/Users/{os.getlogin()}/Downloads'
+    global titulo
     yt = YouTube(link)
     ys = yt.streams.filter(only_audio=True).first().download(path)
     for file in os.listdir(path):
@@ -35,6 +40,7 @@ def download_music(link):
             mp3_path = os.path.join(path, os.path.splitext(file)[0]+'.mp3')
             new_file = mp.AudioFileClip(mp4_path)
             new_file.write_audiofile(mp3_path)
+            titulo = yt.streams[0].default_filename
             musica.reactivate()
 
 
@@ -46,7 +52,7 @@ def aside_music(link):
 
 app = tk.Tk()
 app.title("Baixar vídeo")
-app.geometry('300x200')
+app.geometry('400x220')
 app.resizable(False, False)
 
 
@@ -77,6 +83,9 @@ class VideoFrame(ttk.Frame):
         voltarBtn = tk.Button(self, relief='flat', text="Voltar", width=50, bg="#e2e2e2",
                               activebackground="#c2c2c2", command=lambda: changeScreen(self, main))
         voltarBtn.pack(pady=1)
+        self.finishedLabel = tk.Label(
+            self, text=f"")
+        self.finishedLabel.pack(pady=[5, 0])
 
         def go():
             self.baixarBtn["state"] = "disabled"
@@ -85,6 +94,7 @@ class VideoFrame(ttk.Frame):
 
     def reactivate(self):
         self.baixarBtn["state"] = "normal"
+        self.finishedLabel.config(text=f'{titulo}\nSalvo em: {path}')
 
 
 def changeScreen(exit, enter):
