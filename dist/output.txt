@@ -1,0 +1,2 @@
+MoviePy - Writing audio in C:/Users/jocks/Downloads\Video de 2 segundos.mp3
+chunk:   0%|          | 0/60 [00:00<?, ?it/s, now=None]chunk:   5%|5         | 3/60 [00:00<00:02, 26.15it/s, now=None]                                                               MoviePy - Done.
