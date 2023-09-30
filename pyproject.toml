@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "modulação"
+version = "0.1.0"
+description = ""
+authors = ["jockaplay <jocksonmatheus@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytube = "^15.0.0"
+moviepy = "^1.0.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

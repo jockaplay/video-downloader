@@ -1,27 +1,33 @@
 from pytube import YouTube
+from pytube.exceptions import RegexMatchError
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import moviepy.editor as mp
 import re
 import os
 import sys
+import platform
 import tkinter as tk
 import tkinter.ttk as ttk
 import threading
+
+
 output = open("output.txt", "wt")
 sys.stdout = output
 sys.stderr = output
-
-
 titulo = ""
-path = f'C:/Users/{os.getlogin()}/Downloads'
+path = f'C:/Users/{os.getlogin()}/Downloads' if platform.system() == 'Windows' else f'/home/{os.environ.get("USER")}/Downloads'
 
 
 def download_video(link):
     global titulo
-    yt = YouTube(link)
-    titulo = yt.title
-    ys = yt.streams.filter(only_audio=True).first().download(path)
-    video.reactivate()
+    try:
+        yt = YouTube(link)
+        titulo = yt.title
+        ys = yt.streams.filter(only_audio=True).first()
+        ys.download(path)
+        video.reactivate(True)
+    except RegexMatchError:
+        video.reactivate(False)
 
 
 def aside_video(link):
@@ -32,16 +38,20 @@ def aside_video(link):
 
 def download_music(link):
     global titulo
-    yt = YouTube(link)
-    ys = yt.streams.filter(only_audio=True).first().download(path)
-    for file in os.listdir(path):
-        if re.search('mp4', file):
-            mp4_path = os.path.join(path, file)
-            mp3_path = os.path.join(path, os.path.splitext(file)[0]+'.mp3')
-            new_file = mp.AudioFileClip(mp4_path)
-            new_file.write_audiofile(mp3_path)
-            titulo = yt.streams[0].default_filename
-            musica.reactivate()
+    try:
+        yt = YouTube(link)
+        ys = yt.streams.filter(only_audio=True).first()
+        ys.download(path)
+        for file in os.listdir(path):
+            if re.search('mp4', file):
+                mp4_path = os.path.join(path, file)
+                mp3_path = os.path.join(path, os.path.splitext(file)[0]+'.mp3')
+                new_file = mp.AudioFileClip(mp4_path)
+                new_file.write_audiofile(mp3_path)
+                titulo = yt.streams[0].default_filename
+                musica.reactivate(True)
+    except RegexMatchError:
+        musica.reactivate(False)
 
 
 def aside_music(link):
@@ -92,9 +102,12 @@ class VideoFrame(ttk.Frame):
             aside_video(linkInput.get()) if formato == "video" else aside_music(
                 linkInput.get())
 
-    def reactivate(self):
+    def reactivate(self, success):
         self.baixarBtn["state"] = "normal"
-        self.finishedLabel.config(text=f'{titulo}\nSalvo em: {path}')
+        if success:
+            self.finishedLabel.config(text=f'{titulo}\nSalvo em: {path}')
+        else:
+            self.finishedLabel.config(text=f'Este link é inválido.')
 
 
 def changeScreen(exit, enter):
